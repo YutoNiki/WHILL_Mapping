@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Indoor Mapping</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>インドアマッピング（仮）</h1>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map', {
+            crs: L.CRS.Simple,
+            minZoom: -2
+        });
+
+        var bounds = [[0,0], [1000,1000]];
+        var image = L.imageOverlay('/static/floor_plan.jpg', bounds).addTo(map);
+
+        map.fitBounds(bounds);
+
+        fetch('/data')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(point => {
+                    L.marker([point.y, point.x]).addTo(map)
+                        .bindPopup(`Location: (${point.x}, ${point.y})`);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
